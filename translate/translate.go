@@ -14,12 +14,21 @@ type baiduResult struct {
 	From string `json:"from"`
 	To   string	`json:"to"`
 	Trans_result [](map[string]string) `json:"trans_result"`
+}
 
+type youdaoResult struct {
+	TSpeakUrl string `json:"tSpeakUrl"`
+	Query   string	`json:"query"`
+	Translation []string `json:"translation"`
+	ErrorCode string	`json:"error_code"`
+	Dict map[string]string	`json:"dict"`
+	Webdict map[string]string `json:"webdict"`
+	L string `json:"l"`
+	SpeakUrl string `json:"speak_url"`
 }
 
 /* 生成 sign 值 */
 func genSign(appid string,q string , salt string, key string) string {
-
 	h := md5.New()
 	h.Write([]byte(appid + q + salt + key))
 	return hex.EncodeToString(h.Sum(nil))
@@ -34,7 +43,7 @@ var (
 	strYoudaoKey = "cChiAbqDUAVZOsWJzip9QtNL8NtVnY1i"
 	mapYoudaoParameter = make(map[string][]string)
 )
-/* 有道翻译 */
+/* 开始有道翻译 */
 func StartYoudaoFanyi(fromString string) string {
 
 	strYoudaoQ = fromString
@@ -56,7 +65,10 @@ func StartYoudaoFanyi(fromString string) string {
 	if e != nil {
 		log.Fatal(e)
 	}
-	return string(data)
+
+	var ydResult youdaoResult
+	json.Unmarshal(data,&ydResult)
+	return string(ydResult.Translation[0])
 }
 
 /* 百度翻译相关参数 */

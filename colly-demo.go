@@ -1,10 +1,14 @@
 package main
 
-import "barrier-free-news/translate"
+import (
+	"barrier-free-news/translate"
+	"log"
+)
 
 func main() {
-	//translate.YoudaoFanyi()
-	translate.StartBaiduFanyi("Why Link My Offer To Decision On My Extradition")
+
+	log.Print(translate.StartYoudaoFanyi("i'm han meimei"))
+	//translate.StartBaiduFanyi("Why Link My Offer To Decision On My Extradition")
 
 	//c := colly.NewCollector()
 	//c.OnHTML("li", func(element *colly.HTMLElement) {
