@@ -1,37 +1,24 @@
 package main
 
-import (
-	"awesomeProject1/translate"
-)
+import "barrier-free-news/translate"
 
 func main() {
-	translate.Youdao()
-	//c := colly.NewCollector()
-	//c.UserAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.110 Safari/537.36"
-	//c.OnRequest(func(r *colly.Request) {
-	//	fmt.Println("Visiting ", r.URL)
-	//})
-	//c.OnError(func(r *colly.Response, e error) {
-	//	log.Println("Something went wrong:", e)
-	//})
-	//c.OnResponse(func(r *colly.Response) {
-	//	fmt.Println("Visited ", r.Request.URL)
-	//})
-	//c.OnHTML("h2", func(e *colly.HTMLElement) {
-	//	print(e.Text)
-	//})
-	//c.OnHTML("tr td:nth-of-type(1)", func(e *colly.HTMLElement) {
-	//	fmt.Println("First column of a table row:", e.Text)
-	//})
-	//c.OnXML("//h1", func(e *colly.XMLElement) {
-	//	fmt.Println(e.Text)
-	//})
-	//c.OnScraped(func(r *colly.Response) {
-	//	fmt.Println("Finished ",r.Request.URL)
-	//})
-	//fmt.Printf("user-agent ",c.UserAgent)
-	//c.Visit("https://www.dailymail.co.uk")
+	//translate.YoudaoFanyi()
+	translate.StartBaiduFanyi("Why Link My Offer To Decision On My Extradition")
 
+	//c := colly.NewCollector()
+	//c.OnHTML("li", func(element *colly.HTMLElement) {
+	//	log.Printf("a 元素内容是 : %s ",element.Text)
+	//})
+	//c.OnError(func(response *colly.Response, e error) {
+	//	log.Fatal(e)
+	//})
+	//c.UserAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.110 Safari/537.36"
+	////c.MaxDepth = 0
+	////c.MaxBodySize = 0
+	////c.CacheDir = "/Users/josan/Documents"
+	////c.IgnoreRobotsTxt = true
+	//c.Visit("https://www.ndtv.com/")
 }
 //
 //package main
