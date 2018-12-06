@@ -2,27 +2,30 @@ package main
 
 import (
 	"barrier-free-news/translate"
+	"github.com/gocolly/colly"
 	"log"
 )
 
 func main() {
 
 	log.Print(translate.StartYoudaoFanyi("i'm han meimei"))
-	//translate.StartBaiduFanyi("Why Link My Offer To Decision On My Extradition")
+	translate.StartBaiduFanyi("Why Link My Offer To Decision On My Extradition")
 
-	//c := colly.NewCollector()
-	//c.OnHTML("li", func(element *colly.HTMLElement) {
-	//	log.Printf("a 元素内容是 : %s ",element.Text)
-	//})
-	//c.OnError(func(response *colly.Response, e error) {
-	//	log.Fatal(e)
-	//})
-	//c.UserAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.110 Safari/537.36"
-	////c.MaxDepth = 0
-	////c.MaxBodySize = 0
-	////c.CacheDir = "/Users/josan/Documents"
-	////c.IgnoreRobotsTxt = true
-	//c.Visit("https://www.ndtv.com/")
+	c := colly.NewCollector()
+	c.MaxDepth = 2
+	c.OnHTML("a[href]", func(element *colly.HTMLElement) {
+		c.Visit(element.Attr("href"))
+		log.Print(translate.StartBaiduFanyi(element.Text))
+	})
+	c.OnError(func(response *colly.Response, e error) {
+		log.Fatal(e)
+	})
+	c.UserAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.110 Safari/537.36"
+	//c.MaxDepth = 0
+	//c.MaxBodySize = 0
+	//c.CacheDir = "/Users/josan/Documents"
+	//c.IgnoreRobotsTxt = true
+	c.Visit("https://www.ndtv.com/")
 }
 //
 //package main

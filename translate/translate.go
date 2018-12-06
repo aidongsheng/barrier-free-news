@@ -50,7 +50,7 @@ func StartYoudaoFanyi(fromString string) string {
 	strYoudaoSign := genSign(strYoudaoAppId,strYoudaoQ,strYoudaoSalt,strYoudaoKey)
 
 	mapYoudaoParameter["q"] = []string{strYoudaoQ}
-	mapYoudaoParameter["from"] = []string{"EN"}
+	mapYoudaoParameter["from"] = []string{"auto"}
 	mapYoudaoParameter["to"] = []string{"zh-CHS"}
 	mapYoudaoParameter["appKey"] = []string{strYoudaoAppId}
 	mapYoudaoParameter["salt"] = []string{strYoudaoSalt}
@@ -68,14 +68,18 @@ func StartYoudaoFanyi(fromString string) string {
 
 	var ydResult youdaoResult
 	json.Unmarshal(data,&ydResult)
-	return string(ydResult.Translation[0])
+	if (len(ydResult.Translation) > 0) {
+		return string(ydResult.Translation[0])
+	}else {
+		return ""
+	}
 }
 
 /* 百度翻译相关参数 */
 var (
 	strBaiduAPI = "http://api.fanyi.baidu.com/api/trans/vip/translate"
 	strBaiduQ  string
-	strBaiduFrom = "en"
+	strBaiduFrom = "auto"
 	strBaiduTo = "zh"
 	strBaiduAppId = "20181206000244467"
 	strBaiduKey = "7IwStgeiPlJR4ScGKl0n"
@@ -101,9 +105,12 @@ func StartBaiduFanyi(fromString string) string {
 	if readErr != nil {
 		 log.Fatal(readErr)
 	}
-	log.Print(string(data))
 	var a baiduResult
 	json.Unmarshal(data,&a)
 
-	return string(data)
+	if len(a.Trans_result) > 0 {
+		return a.Trans_result[0]["dst"]
+	}else {
+		return ""
+	}
 }
