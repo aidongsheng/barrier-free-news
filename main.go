@@ -1,7 +1,15 @@
 package main
 
-import "barrier-free-news/Spiders"
+import (
+	"barrier-free-news/controller"
+	"net/http"
+)
 
 func main() {
-	Spiders.DMCrawlIndex()
+	//Spiders.DMCrawlIndex()
+	srv := http.Server{
+		Addr:"192.168.1.3:8000",
+	}
+	http.HandleFunc("/home/",controller.HomePage)
+	srv.ListenAndServe()
 }

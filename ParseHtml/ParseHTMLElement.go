@@ -19,8 +19,8 @@ func dmArticleTitle(element *colly.HTMLElement) {
 		if element.Attr("itemprop") == "url" {
 			link := element.Request.AbsoluteURL(element.Attr("href")	)	// 文章的链接
 			text := element.Text				//	文章的标题
-			log.Printf("标题文字:%s 链接:%s",text,link)
 			transtext := translate.StartBaiduFanyi(text)
+			log.Printf("标题文字:%s 翻译文字:%s 链接:%s",text,transtext,link)
 			database.InsertArticleList(text,transtext,link)
 		}
 	})

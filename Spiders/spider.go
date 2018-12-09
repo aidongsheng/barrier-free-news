@@ -41,9 +41,12 @@ func DMCrawlIndex() {
 	//	新闻标题页面解析
 	c.OnHTML("div[class]", func(element *colly.HTMLElement) {
 		ParseHtml.DMIndex(element)
-		element.ForEach("a[href]", func(i int, element *colly.HTMLElement) {
-			c.Visit(element.Request.AbsoluteURL(element.Attr("href")))
-		})
+
+		if element.Attr("class") == "cleared lead-alpha" {
+			element.ForEach("a[href]", func(i int, element *colly.HTMLElement) {
+				c.Visit(element.Request.AbsoluteURL(element.Attr("href")))
+			})
+		}
 	})
 
 	//	新闻详情页解析
