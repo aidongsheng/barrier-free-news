@@ -8,7 +8,7 @@ import (
 import _ "github.com/go-sql-driver/mysql"
 
 
-const DataSourceName  = "root:ads---@/wcc"
+const dataSourceName  = "root:ads---@/wcc"
 
 
 /***********************************************************************/
@@ -24,7 +24,7 @@ func InsertArticleList(title string , title_translated string, href string)  {
 		title = title[:1000]
 	}
 
-	mydb,openErr := sql.Open("mysql",DataSourceName)
+	mydb,openErr := sql.Open("mysql",dataSourceName)
 	if openErr != nil {
 		log.Fatal(openErr)
 	}
@@ -53,14 +53,14 @@ func InsertArticleList(title string , title_translated string, href string)  {
 }
 
 
-func InsertArticle(title string,author string,articleContent string) {
-	mydb,openErr := sql.Open("mysql",DataSourceName)
+func InsertArticle(title string,author string,articleContent string,href string) {
+	mydb,openErr := sql.Open("mysql",dataSourceName)
 	if openErr != nil {
 		log.Fatal(openErr)
 	}
 
 	defer mydb.Close()
-	insertStmt, insertErr := mydb.Prepare("insert into article values (?,?,?,?)")
+	insertStmt, insertErr := mydb.Prepare("insert into article values (?,?,?,?,?)")
 	if insertErr != nil {
 		log.Fatal(insertErr)
 	}else {
@@ -72,7 +72,7 @@ func InsertArticle(title string,author string,articleContent string) {
 		sec := time.Now().Second()
 		nano := time.Now().Nanosecond()
 		insertTime := time.Date(y,m,d,h,min,sec,nano,time.Local)
-		_,resultErr := insertStmt.Exec(insertTime,title,author,articleContent)
+		_,resultErr := insertStmt.Exec(insertTime,title,author,articleContent,href)
 		log.Printf("插入文章 %s",articleContent)
 		if resultErr != nil{
 			log.Fatal(resultErr)
@@ -81,4 +81,50 @@ func InsertArticle(title string,author string,articleContent string) {
 
 }
 
+/* 从数据库获取所有文章标题数据 */
+func GetAllTitle() (map[string]string){
+	mydb,openErr := sql.Open("mysql",dataSourceName)
+	if openErr != nil {
+		log.Fatal(openErr)
+	}
 
+	defer mydb.Close()
+	rows,qErr := mydb.Query("select al_ti_trans,al_href from article_list")
+	if qErr != nil {
+		log.Fatal(qErr)
+	}
+	result := make(map[string]string)
+	for rows.Next() {
+		var href  string
+		var titleTrans string
+		if err := rows.Scan(&titleTrans,&href); err != nil {
+			log.Fatal(err)
+		}
+		if titleTrans != "" && href != ""{	//	防止出现空标题或空url
+			result[href] = titleTrans
+		}
+	}
+	return result
+}
+
+func GetArticleByHref(query string) (ti string,au string,hr string) {
+	mydb,openErr := sql.Open("mysql",dataSourceName)
+	if openErr != nil {
+		log.Fatal(openErr)
+	}
+
+	defer mydb.Close()
+
+	rows,qErr := mydb.Query("select * from article where href='" + query + "'")
+	if qErr != nil{
+		log.Fatal(qErr)
+	}
+	var title,author,content string
+	for rows.Next() {
+		err := rows.Scan(&title,&author,&content)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
+	return title,author,content
+}

@@ -10,7 +10,7 @@
 
 <ul class="list-group">
     {{ range $key,$value := .}}
-    <li><a href="{{$key}}">{{ $value }}</a></li>
+    <li class="list-group-item"><a href="detail.html" onclick="clickDetail('$key')">{{ $value }}</a></li>
     {{ else }}
     {{ end }}
 </ul>

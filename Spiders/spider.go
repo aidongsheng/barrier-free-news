@@ -2,8 +2,8 @@ package Spiders
 
 import (
 	"barrier-free-news/ParseHtml"
+	"barrier-free-news/database"
 	"github.com/gocolly/colly"
-	"github.com/gocolly/colly/queue"
 	"log"
 )
 
@@ -27,35 +27,40 @@ func DMCrawlIndex() {
 
 	c.UserAgent = agent
 
-	c.OnError(func(response *colly.Response, e error) {
-		log.Fatal(e)
-	})
-
 	c.OnRequest(func(request *colly.Request) {
 		log.Printf("请求ID: %d 链接: %s",request.ID,request.URL)
 	})
 
 	c.OnError(func(response *colly.Response, e error) {
+		log.Fatal(e)
 		log.Printf("抓取失败信息: %s 请求ID: %s 链接: %s",e,response.Request.ID,response.Request.URL)
 	})
 	//	新闻标题页面解析
 	c.OnHTML("div[class]", func(element *colly.HTMLElement) {
-		ParseHtml.DMIndex(element)
-
 		if element.Attr("class") == "cleared lead-alpha" {
+			ParseHtml.DMIndex(element)
 			element.ForEach("a[href]", func(i int, element *colly.HTMLElement) {
-				c.Visit(element.Request.AbsoluteURL(element.Attr("href")))
+				href := element.Attr("href")
+				if len(href) > 4 && href[:3] == "http" {
+					c.Visit(element.Request.AbsoluteURL(element.Attr("href")))
+				}
 			})
+		}
+		if element.Attr("class") == "article-text wide  heading-tag-switch" {
+			ParseHtml.DMDetail(element)
 		}
 	})
 
-	//	新闻详情页解析
-	c.OnHTML("div[class]", func(element *colly.HTMLElement) {
-		ParseHtml.DMDetail(element)
-	})
 
 	c.OnScraped(func(response *colly.Response) {
 		log.Printf("结束抓取 %s %s",response.Request.URL,c.String())
+
+		//	开始详情页新闻抓取
+		hrefs := []string{}
+		for key,_ := range database.GetAllTitle() {
+			hrefs = append(hrefs, key)
+		}
+		DMCrawlDetail(hrefs)
 	})
 
 	c.Visit(dmIndexUrl)
@@ -64,20 +69,11 @@ func DMCrawlIndex() {
 /* 爬取每日邮报文章详情页数据 */
 func DMCrawlDetail(hrefs []string) {
 
-	if c1 == nil {
-		c1 = colly.NewCollector()
-	}
-
-	q,_  := queue.New(
-		2,
-		&queue.InMemoryQueueStorage{MaxSize:10000},
-	)
-
-	for _,url := range hrefs{
-		q.AddURL(url)
-	}
-
+	c1 = colly.NewCollector()
 	c1.UserAgent = agent
+	c1.OnRequest(func(request *colly.Request) {
+		log.Printf("请求ID: %d 链接: %s",request.ID,request.URL)
+	})
 	c1.OnError(func(response *colly.Response, e error) {
 		log.Printf("c1 抓取失败 %s\n失败原因 %s",response.Request.URL,e)
 	})
@@ -87,12 +83,15 @@ func DMCrawlDetail(hrefs []string) {
 	c1.OnScraped(func(response *colly.Response) {
 		log.Printf("c1 结束抓取 %s",response.Request.URL)
 	})
-	c1.OnHTML("div[class=(article-text wide  heading-tag-switch)]", func(element *colly.HTMLElement) {
-		log.Printf("c1 解析 HTML 结果 %s",element.ChildText("h2"))
+	c1.OnHTML("div[class]", func(element *colly.HTMLElement) {
+		if element.Attr("class") == "article-text wide  heading-tag-switch" {
+			log.Print("解析详情页数据")
+			ParseHtml.DMDetail(element)
+		}
 	})
-
-	q.Run(c)
-
+	for _,href := range hrefs {
+		c1.Visit(href)
+	}
 }
 
 /* 爬取每日邮报文章评论数据 */

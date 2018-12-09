@@ -55,17 +55,15 @@ func DMDetail(element *colly.HTMLElement) {
 				})
 			}
 		})
-		element.ForEach("div", func(i int, element *colly.HTMLElement) {
-			if element.Attr("itemprop") == "articleBody" {
-				var tmpcontent string
-				element.ForEach("p", func(i int, element *colly.HTMLElement) {
-					tmpcontent = content + "<p>" + element.Text + "</p>"
-				})
-				log.Printf("内容: %s",content)
-				content = tmpcontent
+		var tmpcontent string
+		element.ForEach("p[class]", func(i int, element *colly.HTMLElement) {
+			if element.Attr("class") == "mol-para-with-font" {
+				tmpcontent = "<p>" + element.Text + "</p>"
+				log.Printf("内容: %s",tmpcontent)
+				content = content + tmpcontent
 			}
 		})
-		database.InsertArticle(title,author,content)
+		database.InsertArticle(title,author,content,element.Response.Request.URL.String())
 	}
 }
 
