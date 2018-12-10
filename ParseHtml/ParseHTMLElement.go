@@ -125,3 +125,69 @@ func ParseJDWDetail(element *colly.HTMLElement) {
 		database.InsertIntoJDWDetail(title,content,element.Request.URL.String())
 	}
 }
+
+/***********************************************************************/
+/***********************************************************************/
+/*********************    泰晤士报解析部分   **************************/
+/***********************************************************************/
+/***********************************************************************/
+
+func ParseTimesTitle(element *colly.HTMLElement) {
+	if element.Attr("class") == "Item-headline Headline--s" || element.Attr("class") == "Item-headline Headline--m" || element.Attr("class") == "Item-headline Headline--l" || element.Attr("class") == "Item-headline Headline--xl" {
+		log.Printf("泰晤士报标题:%s 链接:%s",element.ChildText("a"),element.ChildAttr("a","href"))
+	}
+}
+
+/***********************************************************************/
+/***********************************************************************/
+/*********************    英国卫报解析部分   **************************/
+/***********************************************************************/
+/***********************************************************************/
+
+func ParseGuardianTitle(element *colly.HTMLElement) {
+	if element.Attr("class") == "u-faux-block-link__overlay js-headline-text" {
+		log.Printf("英国卫报标题:%s 链接:%s",element.Text,element.Request.AbsoluteURL(element.Attr("href")))
+	}
+}
+
+
+/***********************************************************************/
+/***********************************************************************/
+/*********************    英国每日电讯报解析部分   **************************/
+/***********************************************************************/
+/***********************************************************************/
+
+var TelegraphDetailHrefs []string	//	英国每日电讯报待抓取详情页链接
+func ParseTelegraph(element *colly.HTMLElement) {
+	if element.Attr("class") == "list-of-entities__item-body-headline" {
+		title := element.ChildText("a")
+		titleTrans := translate.StartYoudaoFanyi(title)
+		href := element.Request.AbsoluteURL(element.ChildAttr("a","href"))
+		TelegraphDetailHrefs = append(TelegraphDetailHrefs,href)
+		database.InsertIntoTelegraph(title,titleTrans,href)
+	}
+}
+
+
+
+func ParseTelegraphDetail(element *colly.HTMLElement) {
+
+
+	if element.Attr("class") == "js-article-inner" {
+		var title ,content string
+		element.ForEach("h1[itemprop]", func(i int, element *colly.HTMLElement) {
+			//	 标题
+			if element.Attr("itemprop") == "headline name" {
+				title = element.Text
+			}
+		})
+		element.ForEach("div[class]", func(i int, element *colly.HTMLElement) {
+			if element.Attr("class") == "article-body-text component version-2" {
+				content = content + "<p>" + element.ChildText("p") + "</p>"
+			}
+		})
+		database.InsertIntoTelegraphDetail(title,content,element.Request.URL.String())
+	}
+	//	作者
+
+}

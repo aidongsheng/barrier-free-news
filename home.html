@@ -5,13 +5,17 @@
     <link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <title>barrier freee news</title>
     <script src="https://unpkg.com/vue/dist/vue.js"></script>
+    <script type="text/javascript" src="http://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+    <script type="text/javascript">
+
+    </script>
 </head>
 <body>
 
 
 <ul class="list-group">
     {{ range $key,$value := .}}
-    <li class="list-group-item"><a href="{{$key}}">{{ $value }}</a></li>
+    <li class="list-group-item"><a id="{{$key}}" href="{{$key}}">{{ $value }}</a></li>
     {{ else }}
     {{ end }}
 </ul>

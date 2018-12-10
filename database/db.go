@@ -169,3 +169,46 @@ func InsertIntoJDWDetail(title string, content string, href string) {
 }
 
 
+
+/*插入简氏防务周刊详情页数据*/
+func InsertIntoTelegraph(title string, titleTrans string, href string) {
+	mydb,openErr := sql.Open("mysql",dataSourceName)
+	if openErr != nil {
+		log.Fatal(openErr)
+	}
+
+	defer mydb.Close()
+
+	stmt,err := mydb.Prepare("insert into Telegraph values (?,?,?,?)")
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Printf("插入简氏防务详情数据:%s %s %s",title,titleTrans,href)
+	strTime := time.Now().Format("2006-01-02 15:04:05")
+	_,ierr := stmt.Exec(strTime,title,titleTrans,href)
+	if ierr != nil {
+		log.Fatal(ierr)
+	}
+}
+
+
+/*插入每日电讯报详情页数据*/
+func InsertIntoTelegraphDetail(title string, content string, href string) {
+	mydb,openErr := sql.Open("mysql",dataSourceName)
+	if openErr != nil {
+		log.Fatal(openErr)
+	}
+
+	defer mydb.Close()
+
+	stmt,err := mydb.Prepare("insert into telegraph_detail values (?,?,?,?)")
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Printf("插入每日电讯报详情数据:%s %s %s",title,content,href)
+	strTime := time.Now().Format("2006-01-02 15:04:05")
+	_,ierr := stmt.Exec(strTime,title,content,href)
+	if ierr != nil {
+		log.Fatal(ierr)
+	}
+}

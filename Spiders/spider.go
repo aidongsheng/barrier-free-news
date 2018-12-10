@@ -159,3 +159,108 @@ func janesDefenceWeeklyDetail(hrefs []string) {
 		c.Visit(href)
 	}
 }
+
+
+
+/***********************************************************************/
+/***********************************************************************/
+/***********************    泰晤士报爬虫部分   ***************************/
+/***********************************************************************/
+/***********************************************************************/
+
+func TheTimes() {
+	c := colly.NewCollector()
+	c.UserAgent = agent
+	c.OnError(func(response *colly.Response, e error) {
+		if e != nil {
+			log.Fatal(e)
+		}
+	})
+	c.OnRequest(func(request *colly.Request) {
+		log.Printf("请求泰晤士报详情ID %d 请求URL %s",request.ID,request.URL)
+	})
+	c.OnHTML("h3[class]", func(element *colly.HTMLElement) {
+		ParseHtml.ParseTimesTitle(element)
+	})
+	c.OnScraped(func(response *colly.Response) {
+		log.Print("抓取简氏防务周刊详情页结束")
+	})
+	c.Visit("https://www.thetimes.co.uk/")
+}
+
+func TheTimesDetail([]string) {
+
+}
+
+
+/***********************************************************************/
+/***********************************************************************/
+/***********************  英国卫报爬虫部分   ***************************/
+/***********************************************************************/
+/***********************************************************************/
+
+func GuardianIndex(){
+	c := colly.NewCollector()
+	c.UserAgent = agent
+	c.OnError(func(response *colly.Response, e error) {
+		if e != nil {
+			log.Fatal(e)
+		}
+	})
+	c.OnRequest(func(request *colly.Request) {
+		log.Printf("请求英国卫报详情ID %d 请求URL %s",request.ID,request.URL)
+	})
+	c.OnHTML("a[class]", func(element *colly.HTMLElement) {
+		ParseHtml.ParseGuardianTitle(element)
+	})
+	c.OnScraped(func(response *colly.Response) {
+		log.Print("抓取英国卫报详情页结束")
+	})
+	c.Visit("https://www.thetimes.co.uk/")
+}
+
+/***********************************************************************/
+/***********************************************************************/
+/***********************  英国每日电讯报爬虫部分   ***************************/
+/***********************************************************************/
+/***********************************************************************/
+
+func TelegraphIndex() {
+	c := colly.NewCollector()
+	c.OnError(func(response *colly.Response, e error) {
+		log.Fatal(e)
+	})
+	c.OnRequest(func(request *colly.Request) {
+		log.Printf("请求每日电讯报ID:%d 链接:%s",request.ID,request.URL.String())
+	})
+	c.OnHTML("h3[class]", func(element *colly.HTMLElement) {
+		ParseHtml.ParseTelegraph(element)
+	})
+	c.OnScraped(func(response *colly.Response) {
+		log.Print("抓取每日电讯报标题结束，开始抓取英国每日电讯报详情页")
+		TelegraphDetail(ParseHtml.TelegraphDetailHrefs)
+	})
+	c.Visit("https://www.telegraph.co.uk/politics/")
+}
+
+func TelegraphDetail(hrefs []string) {
+	c := colly.NewCollector()
+	c.UserAgent = agent
+	c.OnError(func(response *colly.Response, e error) {
+		if e != nil {
+			log.Fatal(e)
+		}
+	})
+	c.OnRequest(func(request *colly.Request) {
+		log.Printf("请求每日电讯报详情ID %d 请求URL %s",request.ID,request.URL)
+	})
+	c.OnHTML("div[class]", func(element *colly.HTMLElement) {
+		ParseHtml.ParseTelegraphDetail(element)
+	})
+	c.OnScraped(func(response *colly.Response) {
+		log.Print("抓取每日电讯报详情页结束")
+	})
+	for _,href := range hrefs{
+		c.Visit(href)
+	}
+}
