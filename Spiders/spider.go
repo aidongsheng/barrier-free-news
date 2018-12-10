@@ -104,3 +104,58 @@ func DMCrawlComment() {
 /************************    印度时报爬虫部分   **************************/
 /***********************************************************************/
 /***********************************************************************/
+
+
+
+
+
+/***********************************************************************/
+/***********************************************************************/
+/*********************    简氏防务周刊爬虫部分   **************************/
+/***********************************************************************/
+/***********************************************************************/
+
+
+func JanesDefenceWeekly() {
+	c := colly.NewCollector()
+	c.UserAgent = agent
+	c.OnError(func(response *colly.Response, e error) {
+		if e != nil {
+			log.Fatal(e)
+		}
+	})
+	c.OnRequest(func(request *colly.Request) {
+		log.Printf("开始请求ID %d 请求URL %s",request.ID,request.URL)
+	})
+
+	c.OnHTML("div[class]", func(element *colly.HTMLElement) {
+		ParseHtml.ParseJDWIndex(element)
+	})
+	c.OnScraped(func(response *colly.Response) {
+		log.Print("抓取简氏防务周刊结束")
+		janesDefenceWeeklyDetail(ParseHtml.DetailHrefs)
+	})
+	c.Visit("https://ihsmarkit.com/research-analysis/aerospace-defense-security.html")
+}
+
+func janesDefenceWeeklyDetail(hrefs []string) {
+	c := colly.NewCollector()
+	c.UserAgent = agent
+	c.OnError(func(response *colly.Response, e error) {
+		if e != nil {
+			log.Fatal(e)
+		}
+	})
+	c.OnRequest(func(request *colly.Request) {
+		log.Printf("请求简氏防务详情ID %d 请求URL %s",request.ID,request.URL)
+	})
+	c.OnHTML("section[class]", func(element *colly.HTMLElement) {
+		ParseHtml.ParseJDWDetail(element)
+	})
+	c.OnScraped(func(response *colly.Response) {
+		log.Print("抓取简氏防务周刊详情页结束")
+	})
+	for _,href := range hrefs{
+		c.Visit(href)
+	}
+}

@@ -19,7 +19,7 @@ func dmArticleTitle(element *colly.HTMLElement) {
 		if element.Attr("itemprop") == "url" {
 			link := element.Request.AbsoluteURL(element.Attr("href")	)	// 文章的链接
 			text := element.Text				//	文章的标题
-			transtext := translate.StartBaiduFanyi(text)
+			transtext := translate.StartYoudaoFanyi(text)
 			log.Printf("标题文字:%s 翻译文字:%s 链接:%s",text,transtext,link)
 			database.InsertArticleList(text,transtext,link)
 		}
@@ -79,3 +79,49 @@ func ParseCommentEle(ele *colly.HTMLElement) {
 /***********************************************************************/
 
 
+
+
+
+/***********************************************************************/
+/***********************************************************************/
+/*********************    简氏防务周刊解析部分   **************************/
+/***********************************************************************/
+/***********************************************************************/
+
+var DetailHrefs []string	//	待抓取详情页链接
+
+func ParseJDWIndex(element *colly.HTMLElement) {
+	if element.Attr("class") == "info image clearfix" {
+
+		element.ForEach("header", func(i int, element *colly.HTMLElement) {
+			var href string
+			element.ForEach("a[href]", func(i int, element *colly.HTMLElement) {
+				href = element.Request.AbsoluteURL(element.Attr("href"))
+				DetailHrefs = append(DetailHrefs,href)
+			})
+
+			timeAuthor := element.ChildText("span")
+			title := element.ChildText("a")
+			log.Printf("简氏防务周刊标题 %s 作者 %s 链接 %s",title,timeAuthor,href)
+			database.InsertIntoJDW(title,timeAuthor,href)
+		})
+	}
+}
+
+
+func ParseJDWDetail(element *colly.HTMLElement) {
+
+	if element.Attr("class") == "content basic-content bg-white no-border blog_post" {
+		var title ,content string
+
+		title = element.ChildText("h1")
+		element.ForEach("span[class]", func(i int, element *colly.HTMLElement) {
+			if element.Attr("class") == "blog_content" {
+				element.ForEach("p", func(i int, element *colly.HTMLElement) {
+					content = content + "<p>" + element.Text + "</p>"
+				})
+			}
+		})
+		database.InsertIntoJDWDetail(title,content,element.Request.URL.String())
+	}
+}

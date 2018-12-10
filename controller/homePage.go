@@ -8,19 +8,9 @@ import (
 
 func HomePage(w http.ResponseWriter, r *http.Request) {
 
-	if r.RequestURI == "/home/detail" {
-		t,_ := template.ParseFiles("detail.html")
-		title,author,content := database.GetArticleByHref(r.FormValue("href"))
-		var a article
-		a.title = title
-		a.author = author
-		a.content = content
-		t.Execute(w,a)
-	}else if r.RequestURI == "/home/" {
-		t,_ := template.ParseFiles("home.html")
-		data := database.GetAllTitle()
-		t.Execute(w,data)
-	}
+	t,_ := template.ParseFiles("home.html")
+	data := database.GetAllTitle()
+	t.Execute(w,data)
 }
 
 type article struct {
@@ -29,7 +19,7 @@ type article struct {
 	content string
 }
 
-func clickDetail(w http.ResponseWriter,r *http.Request) {
+func ClickDetail(w http.ResponseWriter,r *http.Request) {
 	t,_ := template.ParseFiles("detail.html")
 	title,author,content := database.GetArticleByHref(r.FormValue("href"))
 	var a article

@@ -100,6 +100,7 @@ func GetAllTitle() (map[string]string){
 		if err := rows.Scan(&titleTrans,&href); err != nil {
 			log.Fatal(err)
 		}
+		//href = "192.168.101.28:8000/home/detail?href=" + "dododo"
 		if titleTrans != "" && href != ""{	//	防止出现空标题或空url
 			result[href] = titleTrans
 		}
@@ -128,3 +129,43 @@ func GetArticleByHref(query string) (ti string,au string,hr string) {
 	}
 	return title,author,content
 }
+/*插入简氏防务周刊*/
+func InsertIntoJDW(title string, author string, href string) {
+	mydb,openErr := sql.Open("mysql",dataSourceName)
+	if openErr != nil {
+		log.Fatal(openErr)
+	}
+
+	defer mydb.Close()
+
+	stmt,err := mydb.Prepare("insert into janes_article values (?,?,?,?)")
+	if err != nil {
+		log.Fatal(err)
+	}
+	time := time.Now().Format("2006-01-02 15:04:05")
+	_,ierr := stmt.Exec(time,title,author,href)
+	if ierr != nil {
+		log.Fatal(ierr)
+	}
+}
+/*插入简氏防务周刊详情页数据*/
+func InsertIntoJDWDetail(title string, content string, href string) {
+	mydb,openErr := sql.Open("mysql",dataSourceName)
+	if openErr != nil {
+		log.Fatal(openErr)
+	}
+
+	defer mydb.Close()
+
+	stmt,err := mydb.Prepare("insert into janes_detail values (?,?,?)")
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Printf("插入简氏防务详情数据:%s %s %s",title,content,href)
+	_,ierr := stmt.Exec(title,content,href)
+	if ierr != nil {
+		log.Fatal(ierr)
+	}
+}
+
+
