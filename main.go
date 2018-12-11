@@ -13,6 +13,6 @@ func main() {
 	//srv.ListenAndServe()
 	//Spiders.JanesDefenceWeekly()
 	//Spiders.TheTimes()
-	//Spiders.GuardianIndex()
-	Spiders.TelegraphIndex()
+	Spiders.GuardianIndex()
+	//Spiders.TelegraphIndex()
 }
