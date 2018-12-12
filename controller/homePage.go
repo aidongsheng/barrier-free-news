@@ -2,6 +2,7 @@ package controller
 
 import (
 	"barrier-free-news/database"
+	"fmt"
 	"html/template"
 	"net/http"
 )
@@ -20,11 +21,5 @@ type article struct {
 }
 
 func ClickDetail(w http.ResponseWriter,r *http.Request) {
-	t,_ := template.ParseFiles("detail.html")
-	title,author,content := database.GetArticleByHref(r.FormValue("href"))
-	var a article
-	a.title = title
-	a.author = author
-	a.content = content
-	t.Execute(w,a)
+	fmt.Fprintf(w,"hello")
 }
